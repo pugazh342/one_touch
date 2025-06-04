@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONE Touch - Unified Urban Services</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" as="style" onload="this.rel='stylesheet'">
+  <style>
+    /* Universal box-sizing for consistent layout */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      max-width: 900px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .auth-image-section {
+      flex: 1;
+      background: url('https://placehold.co/500x700/7a5cf4/ffffff?text=ONETouch+Auth') center center / cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-image-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(122, 92, 244, 0.4); /* Primary color overlay */
+      z-index: 1;
+    }
+
+    .image-content {
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .image-content h2 {
+      font-size: 2.5em;
+      margin-bottom: 15px;
+    }
+
+    .image-content p {
+      font-size: 1.1em;
+      line-height: 1.5;
+    }
+
+    .auth-form-section {
+      flex: 1;
+      padding: 40px;
+      background: rgba(0, 0, 0, 0.3); /* Darker background for forms */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .auth-form {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .auth-form.active {
+      display: flex;
+    }
+
+    .auth-form h2 {
+      font-size: 2em;
+      margin-bottom: 25px;
+      text-align: center;
+      color: #7a5cf4;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1em;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #7a5cf4;
+      background: rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 0 3px rgba(122, 92, 244, 0.3);
+    }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .error-message {
+      color: #ff4d4d;
+      font-size: 0.85em;
+      margin-top: 5px;
+      height: 18px; /* Reserve space to prevent layout shift */
+      display: block;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #7a5cf4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #6a4ce0;
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .social-login {
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    .social-login p {
+      margin-bottom: 15px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px;
+      background-color: #4285F4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .google-btn:hover {
+      background-color: #357ae8;
+      transform: translateY(-2px);
+    }
+
+    .google-btn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .switch-form-link {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 0.9em;
+    }
+
+    .switch-form-link a {
+      color: #7a5cf4;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .switch-form-link a:hover {
+      color: #a088ff;
+      text-decoration: underline;
+    }
+
+    /* Custom Popup for messages */
+    .custom-popup-overlay {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .custom-popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .custom-popup-content {
+      background: #2c5364;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+      transform: translateY(-20px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .custom-popup-overlay.show .custom-popup-content {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .custom-popup-close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: color 0.2s ease;
+      background: none;
+      border: none;
+      padding: 5px;
+    }
+
+    .custom-popup-close-btn:hover {
+      color: white;
+    }
+
+    .custom-popup-content p {
+      font-size: 18px;
+      margin: 10px 0 0;
+      color: white;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1001; /* Above popup */
+      transition: opacity 1s ease-out;
+      opacity: 1;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 80px;
+      height: 80px;
+      border: 8px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #7a5cf4;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CAPTCHA styles */
+    .captcha-container {
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .captcha-image {
+      width: 150px;
+      height: 50px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #7a5cf4;
+      letter-spacing: 2px;
+      user-select: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .captcha-refresh {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: color 0.3s ease;
+    }
+
+    .captcha-refresh:hover {
+      color: #7a5cf4;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        max-width: 500px;
+      }
+
+      .auth-image-section {
+        height: 200px;
+        flex: none;
+      }
+
+      .auth-form-section {
+        padding: 30px;
+      }
+
+      .auth-form h2 {
+        font-size: 1.8em;
+      }
+
+      .form-group input, .btn, .google-btn {
+        padding: 10px 12px;
+        font-size: 0.95em;
+      }
+
+      .google-btn img {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .auth-form-section {
+        padding: 20px;
+      }
+
+      .auth-form h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        font-size: 0.9em;
+      }
+
+      .form-group input, .btn, .google-btn {
+        padding: 8px 10px;
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <div class="container">
+    <div class="auth-image-section">
+      <div class="image-content">
+        <h2>Welcome to ONETouch</h2>
+        <p>Your unified platform for urban services. Sign in or register to get started!</p>
+      </div>
+    </div>
+    <div class="auth-form-section">
+      <!-- Sign In Form -->
+      <form id="signInForm" class="auth-form active" onsubmit="handleSignIn(event)">
+        <h2>Sign In</h2>
+        <div class="form-group">
+          <label for="signInEmail">Email</label>
+          <input type="email" id="signInEmail" placeholder="your.email@example.com" required autocomplete="email">
+          <span class="error-message" id="signInEmailError"></span>
+        </div>
+        <div class="form-group">
+          <label for="signInPassword">Password</label>
+          <input type="password" id="signInPassword" placeholder="••••••••" required autocomplete="current-password">
+          <span class="error-message" id="signInPasswordError"></span>
+        </div>
+        <div class="form-group captcha-container">
+          <label for="signInCaptchaInput">Enter CAPTCHA</label>
+          <div id="signInCaptchaImage" class="captcha-image"></div>
+          <input type="text" id="signInCaptchaInput" placeholder="Enter text from image" required>
+          <button type="button" class="captcha-refresh" onclick="loadSignInCaptcha()">Refresh CAPTCHA</button>
+          <span class="error-message" id="signInCaptchaError"></span>
+        </div>
+        <button type="submit" class="btn">Sign In</button>
+        <div class="social-login">
+          <p>Or sign in with</p>
+          <div id="g_id_onload"
+               data-client_id="YOUR_GOOGLE_CLIENT_ID"
+               data-callback="handleGoogleSignIn"
+               data-auto_prompt="false">
+          </div>
+          <div class="g_id_signin"
+               data-type="standard"
+               data-size="large"
+               data-theme="outline"
+               data-text="sign_in_with"
+               data-shape="rectangular"
+               data-logo_alignment="left">
+          </div>
+        </div>
+        <div class="switch-form-link">
+          Don't have an account? <a href="#" id="showRegister">Register here</a>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
+        <h2>Register</h2>
+        <div class="form-group">
+          <label for="registerFullName">Full Name</label>
+          <input type="text" id="registerFullName" placeholder="John Doe" required autocomplete="name">
+          <span class="error-message" id="registerFullNameError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" placeholder="your.email@example.com" required autocomplete="email">
+          <span class="error-message" id="registerEmailError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Password</label>
+          <input type="password" id="registerPassword" placeholder="••••••••" required autocomplete="new-password">
+          <span class="error-message" id="registerPasswordError"></span>
+        </div>
+        <div class="form-group">
+          <label for="registerConfirmPassword">Confirm Password</label>
+          <input type="password" id="registerConfirmPassword" placeholder="••••••••" required autocomplete="new-password">
+          <span class="error-message" id="registerConfirmPasswordError"></span>
+        </div>
+        <div class="form-group captcha-container">
+          <label for="registerCaptchaInput">Enter CAPTCHA</label>
+          <div id="registerCaptchaImage" class="captcha-image"></div>
+          <input type="text" id="registerCaptchaInput" placeholder="Enter text from image" required>
+          <button type="button" class="captcha-refresh" onclick="loadRegisterCaptcha()">Refresh CAPTCHA</button>
+          <span class="error-message" id="registerCaptchaError"></span>
+        </div>
+        <button type="submit" class="btn">Register</button>
+        <div class="switch-form-link">
+          Already have an account? <a href="#" id="showSignIn">Sign In here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="customPopup" class="custom-popup-overlay">
+    <div class="custom-popup-content">
+      <button class="custom-popup-close-btn" aria-label="Close popup">&times;</button>
+      <p id="customPopupMessage"></p>
+      <div id="popupActions" style="margin-top: 20px;"></div>
+    </div>
+  </div>
+
+  <script>
+    // Global state for CAPTCHA
+    let signInCaptchaText = '';
+    let registerCaptchaText = '';
+
+    // DOM Elements
+    const signInForm = document.getElementById('signInForm');
+    const registerForm = document.getElementById('registerForm');
+    const showRegisterLink = document.getElementById('showRegister');
+    const showSignInLink = document.getElementById('showSignIn');
+    const customPopup = document.getElementById('customPopup');
+    const customPopupMessage = document.getElementById('customPopupMessage');
+    const customPopupCloseBtn = customPopup.querySelector('.custom-popup-close-btn');
+    const popupActions = document.getElementById('popupActions');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // Utility function to show custom popup
+    function showCustomPopup(message, actions = [], duration = 0) {
+      customPopupMessage.textContent = message;
+      popupActions.innerHTML = '';
+      actions.forEach(action => {
+        const button = document.createElement('button');
+        button.className = 'btn';
+        button.textContent = action.text;
+        button.onclick = () => {
+          action.handler();
+          hideCustomPopup();
+        };
+        popupActions.appendChild(button);
+      });
+      customPopup.classList.add('show');
+      if (duration > 0) {
+        setTimeout(hideCustomPopup, duration);
+      }
+    }
+
+    // Utility function to hide custom popup
+    function hideCustomPopup() {
+      customPopup.classList.remove('show');
+    }
+
+    // Generate CAPTCHA text
+    function generateCaptchaText() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < 6; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    // Load CAPTCHA for Sign In form
+    function loadSignInCaptcha() {
+      signInCaptchaText = generateCaptchaText();
+      document.getElementById('signInCaptchaImage').textContent = signInCaptchaText;
+      document.getElementById('signInCaptchaError').textContent = '';
+      document.getElementById('signInCaptchaInput').value = '';
+    }
+
+    // Load CAPTCHA for Register form
+    function loadRegisterCaptcha() {
+      registerCaptchaText = generateCaptchaText();
+      document.getElementById('registerCaptchaImage').textContent = registerCaptchaText;
+      document.getElementById('registerCaptchaError').textContent = '';
+      document.getElementById('registerCaptchaInput').value = '';
+    }
+
+    // Reset form fields and error messages
+    function resetForm(formId) {
+      const form = document.getElementById(formId);
+      form.reset();
+      form.querySelectorAll('.error-message').forEach(span => span.textContent = '');
+    }
+
+    // Handle Sign In form submission
+    async function handleSignIn(event) {
+      event.preventDefault();
+      let isValid = true;
+
+      const email = document.getElementById('signInEmail').value;
+      const password = document.getElementById('signInPassword').value;
+      const captchaInput = document.getElementById('signInCaptchaInput').value;
+
+      // Basic validation
+      if (!email) {
+        document.getElementById('signInEmailError').textContent = 'Email is required.';
+        isValid = false;
+      } else if (!/\S+@\S+\.\S+/.test(email)) {
+        document.getElementById('signInEmailError').textContent = 'Invalid email format.';
+        isValid = false;
+      } else {
+        document.getElementById('signInEmailError').textContent = '';
+      }
+
+      if (!password) {
+        document.getElementById('signInPasswordError').textContent = 'Password is required.';
+        isValid = false;
+      } else {
+        document.getElementById('signInPasswordError').textContent = '';
+      }
+
+      if (captchaInput !== signInCaptchaText) {
+        document.getElementById('signInCaptchaError').textContent = 'Incorrect CAPTCHA.';
+        loadSignInCaptcha(); // Refresh CAPTCHA on incorrect entry
+        isValid = false;
+      } else {
+        document.getElementById('signInCaptchaError').textContent = '';
+      }
+
+      if (isValid) {
+        // Simulate API call
+        showCustomPopup('Signing in...', [], 0); // Show loading message
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+
+        // In a real application, you would send credentials to a server
+        // and handle authentication response.
+        const isAuthSuccessful = (email === "test@example.com" && password === "password123"); // Dummy check
+
+        if (isAuthSuccessful) {
+          showCustomPopup('Sign In Successful!', [
+            { text: 'Go to Home', handler: () => window.location.href = 'index.html' }
+          ], 5000);
+          console.log('Sign In successful for:', email);
+        } else {
+          showCustomPopup('Sign In Failed: Invalid credentials or CAPTCHA.', [], 3000);
+          console.log('Sign In failed for:', email);
+          loadSignInCaptcha(); // Refresh CAPTCHA on failed login
+        }
+      }
+    }
+
+    // Handle Register form submission
+    async function handleRegister(event) {
+      event.preventDefault();
+      let isValid = true;
+
+      const fullName = document.getElementById('registerFullName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      const confirmPassword = document.getElementById('registerConfirmPassword').value;
+      const captchaInput = document.getElementById('registerCaptchaInput').value;
+
+      // Basic validation
+      if (!fullName) {
+        document.getElementById('registerFullNameError').textContent = 'Full Name is required.';
+        isValid = false;
+      } else {
+        document.getElementById('registerFullNameError').textContent = '';
+      }
+
+      if (!email) {
+        document.getElementById('registerEmailError').textContent = 'Email is required.';
+        isValid = false;
+      } else if (!/\S+@\S+\.\S+/.test(email)) {
+        document.getElementById('registerEmailError').textContent = 'Invalid email format.';
+        isValid = false;
+      } else {
+        document.getElementById('registerEmailError').textContent = '';
+      }
+
+      if (!password) {
+        document.getElementById('registerPasswordError').textContent = 'Password is required.';
+        isValid = false;
+      } else if (password.length < 6) {
+        document.getElementById('registerPasswordError').textContent = 'Password must be at least 6 characters.';
+        isValid = false;
+      } else {
+        document.getElementById('registerPasswordError').textContent = '';
+      }
+
+      if (password !== confirmPassword) {
+        document.getElementById('registerConfirmPasswordError').textContent = 'Passwords do not match.';
+        isValid = false;
+      } else {
+        document.getElementById('registerConfirmPasswordError').textContent = '';
+      }
+
+      if (captchaInput !== registerCaptchaText) {
+        document.getElementById('registerCaptchaError').textContent = 'Incorrect CAPTCHA.';
+        loadRegisterCaptcha(); // Refresh CAPTCHA on incorrect entry
+        isValid = false;
+      } else {
+        document.getElementById('registerCaptchaError').textContent = '';
+      }
+
+      if (isValid) {
+        // Simulate API call
+        showCustomPopup('Registering...', [], 0); // Show loading message
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+
+        // In a real application, you would send registration data to a server
+        // and handle the response.
+        const isRegistrationSuccessful = true; // Dummy success
+
+        if (isRegistrationSuccessful) {
+          showCustomPopup('Registration Successful! You can now sign in.', [
+            { text: 'Go to Sign In', handler: () => {
+              signInForm.classList.add('active');
+              registerForm.classList.remove('active');
+              resetForm('signInForm');
+              resetForm('registerForm');
+              loadSignInCaptcha();
+              document.getElementById('signInEmail').focus();
+            }}
+          ], 5000);
+          console.log('Registration successful for:', email);
+        } else {
+          showCustomPopup('Registration Failed. Please try again.', [], 3000);
+          console.log('Registration failed for:', email);
+          loadRegisterCaptcha(); // Refresh CAPTCHA on failed registration
+        }
+      }
+    }
+
+    // DOMContentLoaded event listener
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initial CAPTCHA load
+      loadSignInCaptcha();
+      loadRegisterCaptcha();
+
+      // Event listener for switching to Register form
+      showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        signInForm.classList.remove('active');
+        registerForm.classList.add('active');
+        resetForm('signInForm');
+        resetForm('registerForm');
+        loadRegisterCaptcha();
+        document.getElementById('registerFullName').focus();
+      });
+
+      // Event listener for switching to Sign In form
+      showSignInLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerForm.classList.remove('active');
+        signInForm.classList.add('active');
+        resetForm('signInForm');
+        resetForm('registerForm');
+        loadSignInCaptcha();
+        document.getElementById('signInEmail').focus();
+      });
+
+      // Event listener for closing the pop-up
+      customPopupCloseBtn.addEventListener('click', hideCustomPopup);
+      customPopup.addEventListener('click', (e) => {
+        if (e.target === customPopup) {
+          hideCustomPopup();
+        }
+      });
+
+      // Dynamically load Google Sign-In script
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+
+      // Hide loading overlay after a delay
+      setTimeout(() => {
+        loadingOverlay.classList.add('hidden');
+      }, 1500); // Increased delay for the animation to play
+    });
+
+    // Google Sign-In Callback (dummy for now)
+    function handleGoogleSignIn(response) {
+      console.log("Google Sign-In Response:", response);
+      // In a real application, you would send the ID token to your backend for verification
+      showCustomPopup('Google Sign-In initiated. (Backend integration needed)', [], 3000);
+    }
+  </script>
+</body>
+</html>

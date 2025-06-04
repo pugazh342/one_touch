@@ -11,6 +11,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
   <style>
+    /* Universal box-sizing for consistent layout */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     /* CSS Variables for consistent theming */
     :root {
       --primary-color: #7a5cf4;
@@ -18,9 +23,10 @@
       --text-light: #ffffff;
       --text-dark: #1a1a1a;
       --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      --bg-dark-mode: linear-gradient(135deg, #1a1a1a, #2c2c2c, #3a3a3a);
-      --card-bg: rgba(255, 255, 255, 0.1);
-      --transition-speed: 0.3s;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --input-bg: rgba(255, 255, 255, 0.1);
+      --input-border: rgba(255, 255, 255, 0.2);
+      --transition: all 0.3s ease;
     }
 
     body {
@@ -29,87 +35,49 @@
       background: var(--bg-gradient);
       color: var(--text-light);
       min-height: 100vh;
-      overflow-x: hidden; /* Prevent horizontal scroll */
-      transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
-      line-height: 1.6;
-      display: flex; /* Use flexbox for overall layout */
-      flex-direction: column; /* Stack content vertically */
-    }
-
-    /* Dark Mode */
-    body.dark-mode {
-      background: var(--bg-dark-mode);
-      color: #e0e0e0;
-    }
-
-    /* High Contrast Mode */
-    body.high-contrast {
-      background: #000;
-      color: #fff;
-      border-color: #fff;
-    }
-
-    body.high-contrast .service-card,
-    body.high-contrast .custom-popup-content,
-    body.high-contrast .nav-drawer,
-    body.high-contrast .footer { /* Apply high contrast to footer */
-      background: #333;
-      border: 2px solid #fff;
-    }
-
-    /* Main Container for content centering */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px; /* Add horizontal padding to main content */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between; /* Pushes footer to the bottom */
+      padding: 20px;
       box-sizing: border-box;
-      flex-grow: 1; /* Allow main content to grow and push footer down */
+      overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
-    /* Header - Sticky Navigation */
-    .header {
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      flex-grow: 1; /* Allows main content to grow */
+    }
+
+    /* Header Styles */
+    header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 0; /* Vertical padding */
+      padding: 20px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      position: sticky; /* Makes the header sticky */
-      top: 0;           /* Sticks it to the top of the viewport */
-      width: 100%;      /* Ensures it spans full width */
-      background: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
-      backdrop-filter: blur(10px); /* Frosted glass effect */
-      z-index: 100;     /* Ensures it stays above other content */
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-      transition: background var(--transition-speed) ease; /* Smooth transition for background */
+      position: sticky;
+      top: 0;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      border-radius: 10px;
     }
 
-    .header .logo {
-      font-size: 24px;
+    .logo {
+      font-size: 28px;
       font-weight: 600;
       color: var(--text-light);
       text-decoration: none;
+      transition: var(--transition);
     }
 
-    /* Hamburger Menu Icon (for mobile) */
-    .hamburger {
-      display: none; /* Hidden by default, shown on smaller screens */
-      background: none;
-      border: none;
-      color: var(--text-light);
-      font-size: 24px;
-      cursor: pointer;
-      padding: 10px;
-      border-radius: 5px;
-      transition: color var(--transition-speed) ease;
-    }
-
-    .hamburger:hover, .hamburger:focus {
+    .logo:hover {
       color: var(--primary-color);
-      outline: 2px solid var(--primary-color);
-      outline-offset: 2px;
     }
 
-    /* Main Navigation Links */
+    /* Navigation Styles */
     nav {
       display: flex;
       gap: 20px;
@@ -118,336 +86,363 @@
     nav a {
       color: var(--text-light);
       text-decoration: none;
-      font-size: 16px;
-      transition: color var(--transition-speed) ease, border-bottom var(--transition-speed) ease;
-      padding: 5px 10px;
-      border-radius: 5px;
+      font-size: 18px;
+      padding: 8px 15px;
+      border-radius: 8px;
+      transition: var(--transition);
     }
 
-    nav a:hover, nav a:focus {
+    nav a:hover,
+    nav a:focus {
+      background-color: rgba(122, 92, 244, 0.1);
       color: var(--primary-color);
       outline: 2px solid var(--primary-color);
-      outline-offset: 2px;
     }
 
-    /* Active Navigation Link Highlighting */
-    nav a.active-link {
-      color: var(--primary-color);
-      border-bottom: 2px solid var(--primary-color);
-      font-weight: 600;
-    }
-
-    /* Mode Toggles */
-    .mode-toggles {
-      display: flex;
-      gap: 10px;
-    }
-
-    .mode-toggle {
+    .hamburger {
+      display: none; /* Hidden by default on larger screens */
       background: none;
       border: none;
       color: var(--text-light);
-      font-size: 20px;
+      font-size: 28px;
       cursor: pointer;
-      transition: color var(--transition-speed) ease;
-      padding: 8px;
+      padding: 10px;
       border-radius: 5px;
+      transition: var(--transition);
     }
 
-    .mode-toggle:hover, .mode-toggle:focus {
+    .hamburger:hover,
+    .hamburger:focus {
       color: var(--primary-color);
       outline: 2px solid var(--primary-color);
-      outline-offset: 2px;
+      background: rgba(122, 92, 244, 0.1);
     }
 
-    /* Navigation Drawer (Mobile) */
+    /* Mobile Navigation Drawer */
     .nav-drawer {
       position: fixed;
       top: 0;
-      left: -250px; /* Off-screen by default */
+      left: 0; /* Align to left edge */
       width: 250px;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(15px);
       padding: 20px;
-      display: flex;
+      display: none; /* Hidden by default, activated by JS */
       flex-direction: column;
-      gap: 20px;
-      transition: left var(--transition-speed) ease;
+      gap: 15px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
       z-index: 200;
+      transform: translateX(-100%); /* Start completely off-screen */
+      opacity: 0;
+      visibility: hidden; /* Hidden from screen readers and interaction */
+      transition: none; /* GSAP will override this, prevent default CSS transition */
     }
 
     .nav-drawer.active {
-      left: 0; /* Slide in */
+      display: flex; /* Show when active */
+      visibility: visible; /* Make visible when active */
+      /* GSAP will handle transform: translateX(0) and opacity: 1 */
     }
 
-    .nav-drawer a, .nav-drawer button {
+    .nav-drawer a {
       color: var(--text-light);
       text-decoration: none;
-      font-size: 18px;
-      padding: 10px;
-      border-radius: 5px;
-      transition: background var(--transition-speed) ease;
+      font-size: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      transition: var(--transition);
       text-align: left;
-      background: none;
-      border: none;
-      cursor: pointer;
     }
 
-    .nav-drawer a:hover, .nav-drawer a:focus,
-    .nav-drawer button:hover, .nav-drawer button:focus {
+    .nav-drawer a:hover,
+    .nav-drawer a:focus {
       background: rgba(122, 92, 244, 0.2);
       outline: 2px solid var(--primary-color);
     }
 
     .nav-drawer .close-btn {
       align-self: flex-end;
-      font-size: 24px;
+      font-size: 30px;
       background: none;
       border: none;
       color: var(--text-light);
       cursor: pointer;
       padding: 5px;
+      transition: var(--transition);
     }
 
-    /* Search Bar Section */
-    .search-bar {
-      margin: 25px 0;
+    .nav-drawer .close-btn:hover {
+      color: var(--primary-color);
+    }
+
+    /* Hero Section */
+    .hero {
       text-align: center;
-      padding: 0 20px; /* Consistent padding */
+      padding: 80px 20px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 15px;
+      margin-top: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero h1 {
+      font-size: 3.5em;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      text-shadow: 0 0 10px rgba(122, 92, 244, 0.5);
+    }
+
+    .hero p {
+      font-size: 1.3em;
+      max-width: 700px;
+      margin: 0 auto 40px auto;
+      opacity: 0.9;
+    }
+
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+      flex-wrap: wrap; /* Allow wrapping on small screens */
     }
 
     .search-bar input {
-      width: 100%;
-      max-width: 500px;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
+      flex-grow: 1;
+      padding: 15px 20px;
+      border: 1px solid var(--input-border);
       border-radius: 10px;
+      background: var(--input-bg);
       color: var(--text-light);
-      font-size: 16px;
-      box-sizing: border-box; /* Include padding in width */
+      font-size: 1.1em;
+      transition: var(--transition);
     }
 
     .search-bar input::placeholder {
       color: rgba(255, 255, 255, 0.7);
     }
 
-    /* Hero Section */
-    .hero {
+    .search-bar input:focus {
+      outline: 2px solid var(--primary-color);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .search-bar button {
+      background-color: var(--primary-color);
+      color: var(--text-light);
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.1em;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .search-bar button:hover,
+    .search-bar button:focus {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Services Section */
+    .services-section {
+      padding: 60px 0;
       text-align: center;
-      padding: 80px 20px; /* Increased vertical padding */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 50vh; /* Ensure it takes up a good portion of the screen */
-      box-sizing: border-box;
     }
 
-    .hero h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-      animation: fadeInDown 1s ease-out; /* Example animation */
+    .services-section h2 {
+      font-size: 2.8em;
+      margin-bottom: 40px;
+      color: var(--primary-color);
+      text-shadow: 0 0 8px rgba(122, 92, 244, 0.4);
     }
 
-    .hero p {
-      font-size: 18px;
-      opacity: 0.8;
-      max-width: 600px;
-      margin: 0 auto 40px;
-      animation: fadeInUp 1s ease-out; /* Example animation */
-    }
-
-    /* Service Grid - Implemented with CSS Grid */
     .service-grid {
       display: grid;
-      /* Responsive columns: at least 280px wide, or distribute space evenly */
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px; /* Space between grid items */
-      padding: 40px 20px; /* Increased padding for the section */
-      max-width: 1200px; /* Match container width */
-      margin: 0 auto; /* Center the grid */
-    }
-
-    /* Service Card Styling */
-    .service-card {
-      background: var(--card-bg); /* Use CSS variable */
-      border-radius: 15px;
-      padding: 30px; /* Increased padding */
-      text-align: center;
-      cursor: pointer;
-      transition: transform var(--transition-speed) ease, background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Initial shadow */
-      display: flex; /* Use flexbox for internal alignment */
-      flex-direction: column;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Further decreased min-width for smaller cards */
+      gap: 25px; /* Adjusted gap for better spacing */
       justify-content: center;
-      align-items: center;
-      min-height: 220px; /* Ensure consistent card height */
     }
 
-    .service-card:hover, .service-card:focus {
-      transform: translateY(-10px) scale(1.02); /* Lift and slight scale effect */
-      background: rgba(255, 255, 255, 0.2);
+    .service-card {
+      background: var(--card-bg);
+      padding: 18px; /* Further decreased padding */
+      border-radius: 15px;
+      text-align: center;
+      transition: var(--transition);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%; /* Ensure cards have equal height */
+    }
+
+    .service-card:hover,
+    .service-card:focus-within {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
       outline: 2px solid var(--primary-color);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
     }
 
-    .service-card i {
-      font-size: 48px; /* Larger icons */
-      margin-bottom: 20px;
+    .service-card .icon {
+      font-size: 2.8em; /* Further decreased icon size */
       color: var(--primary-color);
+      margin-bottom: 12px; /* Adjusted margin */
+      transition: var(--transition);
+    }
+
+    .service-card:hover .icon {
+      transform: scale(1.1);
     }
 
     .service-card h3 {
-      font-size: 22px; /* Larger heading */
-      margin-bottom: 10px;
+      font-size: 1.4em; /* Further decreased heading size */
+      margin-bottom: 8px; /* Adjusted margin */
+      color: var(--text-light);
     }
 
     .service-card p {
-      font-size: 15px;
-      opacity: 0.7;
-      margin-bottom: 0; /* Remove bottom margin if not followed by other elements */
+      font-size: 0.95em; /* Further decreased paragraph size */
+      opacity: 0.8;
+      margin-bottom: 18px; /* Adjusted margin */
+      flex-grow: 1; /* Allows paragraph to take available space */
     }
 
-    /* Three.js Canvas Background */
-    #canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      opacity: 0.2;
+    .service-card .btn {
+      background-color: var(--primary-color);
+      color: var(--text-light);
+      padding: 9px 18px; /* Further decreased button padding */
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em; /* Adjusted button font size */
+      font-weight: 600;
+      text-decoration: none; /* For anchor tags */
+      display: inline-block; /* For anchor tags */
+      transition: var(--transition);
     }
 
-    /* Debug Panel */
-    .debug-panel {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px;
+    .service-card .btn:hover,
+    .service-card .btn:focus {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Merkle Tree Info Section */
+    .merkle-info {
+      background: rgba(255, 255, 255, 0.03);
       border-radius: 10px;
-      font-size: 12px;
-      max-width: 300px;
-      display: none;
-      color: rgba(255, 255, 255, 0.8);
-      z-index: 500; /* Ensure it's visible */
+      padding: 20px;
+      margin-top: 50px;
+      text-align: center;
+      font-size: 0.9em;
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(5px);
     }
 
-    .debug-panel.active {
-      display: block;
+    .merkle-info p {
+      margin: 5px 0;
     }
 
-    /* Custom Popup Styles */
-    .custom-popup-overlay {
-      display: flex;
+    .merkle-info strong {
+      color: var(--primary-color);
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: var(--bg-gradient);
+      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity var(--transition-speed) ease, visibility var(--transition-speed) ease;
-    }
-
-    .custom-popup-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .custom-popup-content {
-      background: #2c5364;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-      position: relative;
-      transform: translateY(-20px);
-      opacity: 0;
-      transition: transform var(--transition-speed) ease, opacity var(--transition-speed) ease;
-    }
-
-    .custom-popup-overlay.show .custom-popup-content {
-      transform: translateY(0);
+      transition: opacity 1s ease-out;
       opacity: 1;
     }
 
-    .custom-popup-close-btn {
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-spinner {
+      width: 80px;
+      height: 80px;
+      border: 8px solid rgba(255, 255, 255, 0.3);
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Three.js Canvas */
+    #three-canvas {
       position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      color: rgba(255, 255, 255, 0.7);
-      cursor: pointer;
-      transition: color 0.2s ease;
-      background: none; /* Ensure no default button styling */
-      border: none;
-      padding: 5px;
-    }
-
-    .custom-popup-close-btn:hover, .custom-popup-close-btn:focus {
-      color: var(--text-light);
-      outline: 2px solid var(--primary-color);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Behind other content */
+      opacity: 0.1; /* Subtle background */
     }
 
     /* Footer Styles */
     .footer {
-      background: rgba(0, 0, 0, 0.3); /* Slightly darker, semi-transparent */
-      backdrop-filter: blur(5px);
+      background: rgba(0, 0, 0, 0.3); /* Slightly darker, semi-transparent background */
+      color: var(--text-light);
       padding: 40px 20px;
-      color: rgba(255, 255, 255, 0.7);
-      text-align: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
       margin-top: 50px; /* Space above the footer */
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+      flex-shrink: 0; /* Prevent footer from shrinking */
     }
 
-    .footer .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
+    .footer-container {
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 30px;
+      justify-content: space-around;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 30px; /* Space between footer sections */
     }
 
     .footer-section {
-      flex: 1 1 250px; /* Allows sections to grow/shrink, min-width 250px */
+      flex: 1;
+      min-width: 200px;
       margin-bottom: 20px;
     }
 
-    .footer-section h4 {
-      font-size: 1.2rem;
-      color: var(--text-light);
+    .footer-section h3 {
+      color: var(--primary-color);
       margin-bottom: 15px;
-      position: relative;
-      padding-bottom: 5px;
+      font-size: 1.2em;
     }
 
-    .footer-section h4::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 40px;
-      height: 2px;
-      background-color: var(--primary-color);
-    }
-
-    .footer-section p, .footer-section ul {
-      font-size: 0.95rem;
-      line-height: 1.8;
+    .footer-section p {
+      font-size: 0.9em;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.8);
     }
 
     .footer-section ul {
@@ -461,415 +456,372 @@
     }
 
     .footer-section ul li a {
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--text-light);
       text-decoration: none;
-      transition: color var(--transition-speed) ease;
+      transition: color 0.3s ease;
     }
 
     .footer-section ul li a:hover {
-      color: var(--primary-color);
-      text-decoration: underline;
+      color: var(--primary-hover);
     }
 
     .social-icons {
       display: flex;
+      justify-content: center;
       gap: 15px;
-      margin-top: 20px;
-      justify-content: center; /* Center social icons within their section */
+      margin-top: 15px;
     }
 
     .social-icons a {
       color: var(--text-light);
-      font-size: 1.5rem;
-      transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+      font-size: 1.5em;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
 
     .social-icons a:hover {
-      color: var(--primary-color);
-      transform: translateY(-3px);
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
     }
 
     .footer-bottom {
-      margin-top: 40px;
+      margin-top: 30px;
       padding-top: 20px;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 0.85rem;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    /* Animations */
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      font-size: 0.85em;
+      color: rgba(255, 255, 255, 0.6);
     }
 
     /* Responsive Design */
     @media (max-width: 768px) {
-      .hamburger { display: block; } /* Show hamburger on small screens */
-      nav, .mode-toggles { display: none; } /* Hide main nav and toggles */
-      
-      .header {
-        padding: 15px 20px; /* Adjust header padding */
+      header {
+        padding: 15px 0;
       }
 
-      .hero h1 { font-size: 36px; }
-      .hero p { font-size: 16px; }
-      
-      .service-grid { 
-        grid-template-columns: 1fr; /* Stack service cards vertically */
-        padding: 20px; /* Adjust padding */
+      nav {
+        display: none; /* Hide desktop nav on small screens */
       }
-      
-      .search-bar input { max-width: 100%; }
-      .debug-panel { max-width: 90%; }
 
-      .footer-content {
-        flex-direction: column; /* Stack footer sections vertically */
+      .hamburger {
+        display: block; /* Show hamburger on small screens */
+      }
+
+      .hero h1 {
+        font-size: 2.5em;
+      }
+
+      .hero p {
+        font-size: 1em;
+      }
+
+      .search-bar {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .search-bar input,
+      .search-bar button {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .services-section h2 {
+        font-size: 2em;
+      }
+
+      .service-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically */
+      }
+
+      .footer-container {
+        flex-direction: column;
         align-items: center;
       }
 
       .footer-section {
         text-align: center;
-        flex: 1 1 100%; /* Take full width */
+        width: 100%;
       }
 
-      .footer-section h4::after {
-        left: 50%;
-        transform: translateX(-50%);
+      .footer-section ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .footer-section ul li {
+        margin-bottom: 0;
       }
     }
 
     @media (max-width: 480px) {
-      .hero h1 { font-size: 28px; }
-      .service-card { padding: 20px; }
-      .service-card i { font-size: 40px; }
-      .service-card h3 { font-size: 20px; }
+      body {
+        padding: 10px;
+      }
+
+      .hero {
+        padding: 60px 15px;
+      }
+
+      .hero h1 {
+        font-size: 2em;
+      }
+
+      .services-section {
+        padding: 40px 0;
+      }
+
+      .service-card {
+        padding: 20px; /* Adjusted padding for very small screens */
+      }
+
+      .service-card .icon {
+        font-size: 2.5em; /* Adjusted icon size for very small screens */
+      }
+
+      .service-card h3 {
+        font-size: 1.3em; /* Adjusted heading size for very small screens */
+      }
+
+      .service-card p {
+        font-size: 0.9em; /* Adjusted paragraph size for very small screens */
+      }
+
+      .service-card .btn {
+        font-size: 0.85em; /* Adjusted button font size for very small screens */
+        padding: 8px 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
   <div class="container">
-    <header class="header">
-      <a href="index.html" class="logo" aria-label="ONETouch Home">ONETouch</a>
-      <button class="hamburger" aria-label="Toggle navigation menu" aria-controls="navDrawer">
+    <header>
+      <a href="index.html" class="logo">ONETouch</a>
+      <button class="hamburger" aria-label="Toggle navigation menu">
         <i class="fas fa-bars"></i>
       </button>
       <nav aria-label="Main navigation">
-        <a href="food-delivery.html" aria-label="Go to Food Delivery">Food Delivery</a>
-        <a href="ride-booking.html" aria-label="Go to Ride Booking">Ride Booking</a>
-        <a href="medical-services.html" aria-label="Go to Medical Services">Medical Services</a>
-        <a href="profile.html" aria-label="Go to Profile">Profile</a>
+        <a href="food-delivery.html">Food Delivery</a>
+        <a href="ride-booking.html">Ride Booking</a>
+        <a href="medical-services.html">Medical Services</a>
+        <a href="shopping.html">Shopping</a>
+        <a href="cart.html">Cart</a>
+        <a href="auth.html">Account</a>
       </nav>
-      <div class="mode-toggles">
-        <button class="mode-toggle" aria-label="Toggle dark mode" onclick="toggleDarkMode()">
-          <i class="fas fa-moon"></i>
-        </button>
-        <button class="mode-toggle" aria-label="Toggle high contrast mode" onclick="toggleHighContrast()">
-          <i class="fas fa-adjust"></i>
-        </button>
-        <button class="mode-toggle" aria-label="Toggle debug panel" onclick="toggleDebugPanel()">
-          <i class="fas fa-bug"></i>
-        </button>
-      </div>
     </header>
 
-    <div id="navDrawer" class="nav-drawer">
+    <div class="nav-drawer" id="navDrawer">
       <button class="close-btn" aria-label="Close navigation menu">
         <i class="fas fa-times"></i>
       </button>
-      <a href="index.html" aria-label="Go to Home" onclick="closeNav()">Home</a>
-      <a href="food-delivery.html" aria-label="Go to Food Delivery" onclick="closeNav()">Food Delivery</a>
-      <a href="ride-booking.html" aria-label="Go to Ride Booking" onclick="closeNav()">Ride Booking</a>
-      <a href="medical-services.html" aria-label="Go to Medical Services" onclick="closeNav()">Medical Services</a>
-      <a href="profile.html" aria-label="Go to Profile" onclick="closeNav()">Profile</a>
-      <button class="mode-toggle" aria-label="Toggle dark mode" onclick="toggleDarkMode(); closeNav()">
-        Dark Mode <i class="fas fa-moon"></i>
-      </button>
-      <button class="mode-toggle" aria-label="Toggle high contrast mode" onclick="toggleHighContrast(); closeNav()">
-        High Contrast <i class="fas fa-adjust"></i>
-      </button>
-      <button class="mode-toggle" aria-label="Toggle debug panel" onclick="toggleDebugPanel(); closeNav()">
-        Debug Logs <i class="fas fa-bug"></i>
-      </button>
+      <a href="food-delivery.html" onclick="closeNav()">Food Delivery</a>
+      <a href="ride-booking.html" onclick="closeNav()">Ride Booking</a>
+      <a href="medical-services.html" onclick="closeNav()">Medical Services</a>
+      <a href="shopping.html" onclick="closeNav()">Shopping</a>
+      <a href="cart.html" onclick="closeNav()">Cart</a>
+      <a href="auth.html" onclick="closeNav()">Account</a>
     </div>
 
     <main>
-      <section class="search-bar">
-        <input type="text" placeholder="Search services or locations..." aria-label="Search services or locations" oninput="logSearch(this.value)">
-      </section>
-
+      <canvas id="three-canvas"></canvas>
       <section class="hero">
-        <h1>Welcome to ONETouch</h1>
-        <p>Your one-stop platform for urban services: food delivery, ride booking, and medical care.</p>
+        <h1>Your City, One Touch Away.</h1>
+        <p>Experience seamless urban living with ONETouch. From food delivery to ride bookings, medical services, and shopping – all in one unified platform.</p>
+        <div class="search-bar">
+          <input type="search" id="mainSearchInput" placeholder="Search for services, restaurants, or stores..." aria-label="Search for services, restaurants, or stores">
+          <button onclick="performSearch()">Search</button>
+        </div>
       </section>
 
-      <section class="service-grid">
-        <div class="service-card" onclick="navigateTo('food-delivery')" role="button" aria-label="Explore Food Delivery" tabindex="0">
-          <i class="fas fa-utensils"></i>
-          <h3>Food Delivery</h3>
-          <p>Order from your favorite restaurants with ease.</p>
+      <section class="services-section">
+        <h2>Our Services</h2>
+        <div class="service-grid">
+          <div class="service-card">
+            <div class="icon"><i class="fas fa-utensils"></i></div>
+            <h3>Food Delivery</h3>
+            <p>Order from your favorite restaurants and get delicious meals delivered to your doorstep.</p>
+            <a href="food-delivery.html" class="btn">Order Food</a>
+          </div>
+          <div class="service-card">
+            <div class="icon"><i class="fas fa-car"></i></div>
+            <h3>Ride Booking</h3>
+            <p>Book a ride quickly and safely. Get to your destination with ease.</p>
+            <a href="ride-booking.html" class="btn">Book a Ride</a>
+          </div>
+          <div class="service-card">
+            <div class="icon"><i class="fas fa-medkit"></i></div>
+            <h3>Medical Services</h3>
+            <p>Find doctors, book appointments, and order medicines online. Your health, simplified.</p>
+            <a href="medical-services.html" class="btn">Get Medical Help</a>
+          </div>
+          <div class="service-card">
+            <div class="icon"><i class="fas fa-shopping-bag"></i></div>
+            <h3>Shopping</h3>
+            <p>Shop for groceries, electronics, fashion, and more from local and online stores.</p>
+            <a href="shopping.html" class="btn">Start Shopping</a>
+          </div>
         </div>
-        <div class="service-card" onclick="navigateTo('ride-booking')" role="button" aria-label="Explore Ride Booking" tabindex="0">
-          <i class="fas fa-car"></i>
-          <h3>Ride Booking</h3>
-          <p>Book a ride to anywhere in the city.</p>
-        </div>
-        <div class="service-card" onclick="navigateTo('medical-services')" role="button" aria-label="Explore Medical Services" tabindex="0">
-          <i class="fas fa-heartbeat"></i>
-          <h3>Medical Services</h3>
-          <p>Schedule appointments and manage prescriptions.</p>
-        </div>
-        <div class="service-card" onclick="showCustomPopup('Module not yet implemented.')" role="button" aria-label="Explore Home Services" tabindex="0">
-          <i class="fas fa-home"></i>
-          <h3>Home Services</h3>
-          <p>Find reliable help for home repairs and maintenance.</p>
-        </div>
-        <div class="service-card" onclick="showCustomPopup('Module not yet implemented.')" role="button" aria-label="Explore Event Booking" tabindex="0">
-          <i class="fas fa-ticket-alt"></i>
-          <h3>Event Booking</h3>
-          <p>Discover and book tickets for local events.</p>
-        </div>
-        <div class="service-card" onclick="showCustomPopup('Module not yet implemented.')" role="button" aria-label="Explore Package Delivery" tabindex="0">
-          <i class="fas fa-box"></i>
-          <h3>Package Delivery</h3>
-          <p>Send and receive packages quickly and securely.</p>
-        </div>
+      </section>
+
+      <section class="merkle-info">
+        <h3>Action Log Integrity (Merkle Tree)</h3>
+        <p>Total Actions Logged: <strong id="logCount">0</strong></p>
+        <p>Current Merkle Root (first 10 chars): <strong id="merkleRoot">Calculating...</strong></p>
+        <p>This demonstrates a tamper-evident log of user interactions for enhanced security and transparency.</p>
       </section>
     </main>
-
-    <div id="debugPanel" class="debug-panel">
-      <p>Latest Merkle Root: <span id="merkleRoot"></span></p>
-      <p>Log Count: <span id="logCount">0</span></p>
-    </div>
   </div>
 
   <div id="customPopup" class="custom-popup-overlay">
     <div class="custom-popup-content">
-      <span class="custom-popup-close-btn" aria-label="Close popup">×</span>
+      <button class="custom-popup-close-btn" aria-label="Close popup">&times;</button>
       <p id="customPopupMessage"></p>
+      <div id="popupActions" style="margin-top: 20px;"></div>
     </div>
   </div>
 
   <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h4>About ONETouch</h4>
-        <p>Your ultimate platform for seamless urban services, simplifying your daily life with just one touch.</p>
-      </div>
-      <div class="footer-section">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="food-delivery.html" onclick="logAction('Clicked footer Food Delivery link')">Food Delivery</a></li>
-          <li><a href="ride-booking.html" onclick="logAction('Clicked footer Ride Booking link')">Ride Booking</a></li>
-          <li><a href="medical-services.html" onclick="logAction('Clicked footer Medical Services link')">Medical Services</a></li>
-          <li><a href="profile.html" onclick="logAction('Clicked footer Profile link')">My Profile</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h4>Connect With Us</h4>
-        <div class="social-icons">
-          <a href="#" aria-label="Facebook" onclick="logAction('Clicked Facebook icon')"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" aria-label="Twitter" onclick="logAction('Clicked Twitter icon')"><i class="fab fa-twitter"></i></a>
-          <a href="#" aria-label="Instagram" onclick="logAction('Clicked Instagram icon')"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="LinkedIn" onclick="logAction('Clicked LinkedIn icon')"><i class="fab fa-linkedin-in"></i></a>
+    <div class="footer-container">
+        <div class="footer-section about">
+            <h3>About ONETouch</h3>
+            <p>Your ultimate unified urban services platform. Simplifying your daily life with food delivery, ride bookings, medical services, and shopping all in one place.</p>
         </div>
-      </div>
+        <div class="footer-section links">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="food-delivery.html">Food Delivery</a></li>
+                <li><a href="ride-booking.html">Ride Booking</a></li>
+                <li><a href="medical-services.html">Medical Services</a></li>
+                <li><a href="shopping.html">Shopping</a></li>
+                <li><a href="auth.html">Account</a></li>
+            </ul>
+        </div>
+        <div class="footer-section contact">
+            <h3>Contact Us</h3>
+            <p>Email: support@onetouch.com</p>
+            <p>Phone: +91 98765 43210</p>
+            <p>Address: 123 Urban St, Metropolis, India</p>
+        </div>
+        <div class="footer-section social">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2025 ONETouch. All rights reserved.
+        <p>&copy; 2025 ONETouch. All rights reserved.</p>
     </div>
-  </footer>
+</footer>
 
   <script>
-    // Popup Functions
-    const customPopup = document.getElementById('customPopup');
-    const customPopupMessage = document.getElementById('customPopupMessage');
-    const customPopupCloseBtn = document.querySelector('.custom-popup-close-btn');
-
-    function showCustomPopup(message) {
-      customPopupMessage.textContent = message;
-      customPopup.classList.add('show');
-    }
-
-    function hideCustomPopup() {
-      customPopup.classList.remove('show');
-    }
-
-    // Navigation Drawer
-    const hamburger = document.querySelector('.hamburger');
-    const navDrawer = document.querySelector('.nav-drawer');
-    const closeBtn = document.querySelector('.nav-drawer .close-btn');
-
-    function openNav() {
-      navDrawer.classList.add('active');
-      gsap.to(navDrawer, { x: 0, duration: 0.3, ease: 'power2.out' });
-      logAction('Opened navigation menu');
-    }
-
-    function closeNav() {
-      gsap.to(navDrawer, { x: -250, duration: 0.3, ease: 'power2.in', onComplete: () => {
-        navDrawer.classList.remove('active');
-      }});
-      logAction('Closed navigation menu');
-    }
-
-    hamburger.addEventListener('click', openNav);
-    closeBtn.addEventListener('click', closeNav);
-
-    // Mode Toggles
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-      const icons = document.querySelectorAll('.mode-toggle .fa-moon, .mode-toggle .fa-sun');
-      icons.forEach(icon => {
-        icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
-      });
-      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); // Save preference
-      logAction('Toggled dark mode');
-    }
-
-    function toggleHighContrast() {
-      document.body.classList.toggle('high-contrast');
-      const icons = document.querySelectorAll('.mode-toggle .fa-adjust, .mode-toggle .fa-circle-half-stroke');
-      icons.forEach(icon => {
-        icon.className = document.body.classList.contains('high-contrast') ? 'fas fa-circle-half-stroke' : 'fas fa-adjust';
-      });
-      localStorage.setItem('highContrast', document.body.classList.contains('high-contrast')); // Save preference
-      logAction('Toggled high contrast mode');
-    }
-
-    function toggleDebugPanel() {
-      const debugPanel = document.getElementById('debugPanel');
-      debugPanel.classList.toggle('active');
-      logAction('Toggled debug panel');
-    }
-
-    // GSAP Animations
-    document.addEventListener('DOMContentLoaded', () => {
-      // Animate service cards on load
-      gsap.from('.service-card', {
-        opacity: 0,
-        y: 50,
-        duration: 1,
-        stagger: 0.2,
-        ease: 'power2.out'
-      });
-
-      // Animate hero section text
-      gsap.from('.hero h1', {
-        opacity: 0,
-        y: 30,
-        duration: 1,
-        delay: 0.5,
-        ease: 'power2.out'
-      });
-      gsap.from('.hero p', {
-        opacity: 0,
-        y: 30,
-        duration: 1,
-        delay: 0.7,
-        ease: 'power2.out'
-      });
-
-      // Add hover animations for service cards
-      document.querySelectorAll('.service-card').forEach(card => {
-        card.addEventListener('mouseenter', () => {
-          gsap.to(card, { rotationX: 5, rotationY: 5, duration: 0.3, ease: 'power1.out' });
-        });
-        card.addEventListener('mouseleave', () => {
-          gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.3, ease: 'power1.out' });
-        });
-        // Keyboard accessibility for service cards
-        card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            card.click(); // Simulate click on Enter/Space
-          }
-        });
-      });
-
-      // Close popup on click outside or close button
-      customPopupCloseBtn.addEventListener('click', hideCustomPopup);
-      customPopup.addEventListener('click', (e => {
-        if (e.target === customPopup) hideCustomPopup();
-      }));
-
-      // Set active link on load
-      const currentPage = window.location.pathname.split('/').pop() || 'index.html'; // Default to index.html if root
-      document.querySelectorAll('nav a').forEach(link => {
-        if (link.getAttribute('href').includes(currentPage)) {
-          link.classList.add('active-link');
-        }
-      });
-
-      // Check for saved mode preferences
-      if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark-mode');
-        document.querySelector('.mode-toggle .fa-moon').className = 'fas fa-sun';
-      }
-      if (localStorage.getItem('highContrast') === 'true') {
-        document.body.classList.add('high-contrast');
-        document.querySelector('.mode-toggle .fa-adjust').className = 'fas fa-circle-half-stroke';
-      }
-    });
-
-    // Three.js Cityscape Animation
-    // Move Three.js initialization and animation into window.onload to ensure the library is fully loaded
-    window.onload = function() {
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), alpha: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-
-      const buildings = new THREE.Group();
-      const buildingCount = 20;
-      const material = new THREE.MeshBasicMaterial({ color: 0x7a5cf4 }); // Use primary color
-
-      for (let i = 0; i < buildingCount; i++) {
-        const height = Math.random() * 2 + 1;
-        const building = new THREE.Mesh(
-          new THREE.BoxGeometry(0.4, height, 0.4),
-          material
-        );
-        building.position.set(
-          (Math.random() - 0.5) * 10,
-          height / 2,
-          (Math.random() - 0.5) * 10
-        );
-        buildings.add(building);
-      }
-      scene.add(buildings);
-      camera.position.z = 10;
-
-      function animate() {
-        requestAnimationFrame(animate);
-        buildings.rotation.y += 0.002;
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-    };
-
-
-    // Security: SHA-256 Hashing and Merkle Tree for Action Logging
+    // Global state object
     let actionLogs = JSON.parse(localStorage.getItem('actionLogs')) || [];
 
+    // Three.js setup
+    let scene, camera, renderer, particles, particleMaterial;
+
+    function initThreeJS() {
+      // Scene
+      scene = new THREE.Scene();
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 5;
+
+      // Renderer
+      const canvas = document.getElementById('three-canvas');
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      // Particles
+      const particleCount = 1000;
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      const color1 = new THREE.Color(0x7a5cf4); // Primary color
+      const color2 = new THREE.Color(0x2c5364); // Darker background shade
+
+      for (let i = 0; i < particleCount; i++) {
+        // Position
+        positions[i * 3] = (Math.random() - 0.5) * 10;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+
+        // Color (interpolate between two colors)
+        const mixRatio = Math.random();
+        color1.lerp(color2, mixRatio);
+        colors[i * 3] = color1.r;
+        colors[i * 3 + 1] = color1.g;
+        colors[i * 3 + 2] = color1.b;
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      particleMaterial = new THREE.PointsMaterial({
+        size: 0.05,
+        vertexColors: true,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        opacity: 0.8
+      });
+
+      particles = new THREE.Points(geometry, particleMaterial);
+      scene.add(particles);
+
+      // Animation loop
+      animateThreeJS();
+
+      // Handle window resize
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    function animateThreeJS() {
+      requestAnimationFrame(animateThreeJS);
+
+      // Animate particles
+      if (particles) {
+        particles.rotation.x += 0.0005;
+        particles.rotation.y += 0.0008;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // Merkle Tree Functions
     async function hashData(data) {
       try {
-        const encoder = new TextEncoder();
-        const dataBuffer = encoder.encode(data);
+        const textEncoder = new TextEncoder();
+        const dataBuffer = textEncoder.encode(data);
         const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hexHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hexHash;
       } catch (error) {
         console.error('Hashing error:', error);
         return '';
@@ -878,18 +830,23 @@
 
     async function buildMerkleTree(leaves) {
       if (leaves.length === 0) return '';
+      
       try {
         let tempLeaves = [...leaves];
+        
         while (tempLeaves.length > 1) {
           const temp = [];
+          
           for (let i = 0; i < tempLeaves.length; i += 2) {
             const left = tempLeaves[i];
             const right = i + 1 < tempLeaves.length ? tempLeaves[i + 1] : left;
             const combined = await hashData(left + right);
             temp.push(combined);
           }
+          
           tempLeaves = temp;
         }
+        
         return tempLeaves[0];
       } catch (error) {
         console.error('Merkle tree error:', error);
@@ -904,7 +861,7 @@
       actionLogs.push({ log: logEntry, hash });
       localStorage.setItem('actionLogs', JSON.stringify(actionLogs));
       const merkleRoot = await buildMerkleTree(actionLogs.map(log => log.hash));
-      document.getElementById('merkleRoot').textContent = merkleRoot.slice(0, 10) + '...';
+      document.getElementById('merkleRoot').textContent = merkleRoot.slice(0, 10) + '...'; 
       document.getElementById('logCount').textContent = actionLogs.length;
       console.log('Action Logged:', { logEntry, hash, merkleRoot });
     }
@@ -920,17 +877,127 @@
       'food-delivery': 'food-delivery.html',
       'ride-booking': 'ride-booking.html',
       'medical-services': 'medical-services.html',
-      'profile': 'profile.html'
+      'shopping': 'shopping.html',
+      'cart': 'cart.html',
+      'auth': 'auth.html'
     };
 
     async function navigateTo(page) {
       const url = routes[page] || '#';
       if (url !== '#') {
         window.location.href = url;
-      } else {
-        showCustomPopup(`Navigating to ${page.replace('-', ' ')}... (Module not yet implemented)`);
+        await logAction(`Navigated to: ${page}`);
       }
-      await logAction(`Navigated to ${page}`);
+    }
+
+    // Custom Popup Functions
+    const customPopup = document.getElementById('customPopup');
+    const customPopupMessage = document.getElementById('customPopupMessage');
+    const popupActions = document.getElementById('popupActions');
+
+    function initPopup() {
+      const closeButton = customPopup.querySelector('.custom-popup-close-btn');
+      closeButton.addEventListener('click', hideCustomPopup);
+      customPopup.addEventListener('click', (e) => {
+        if (e.target === customPopup) {
+          hideCustomPopup();
+        }
+      });
+    }
+
+    function showCustomPopup(message, actions = [], duration = 0) {
+      customPopupMessage.textContent = message;
+      popupActions.innerHTML = '';
+      actions.forEach(action => {
+        const button = document.createElement('button');
+        button.className = 'btn';
+        button.textContent = action.text;
+        button.onclick = () => {
+          action.handler();
+          hideCustomPopup();
+        };
+        popupActions.appendChild(button);
+      });
+      customPopup.classList.add('show');
+      if (duration > 0) {
+        setTimeout(hideCustomPopup, duration);
+      }
+      logAction('Showed custom popup');
+    }
+
+    function hideCustomPopup() {
+      customPopup.classList.remove('show');
+      logAction('Hid custom popup');
+    }
+
+    // DOMContentLoaded event listener
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Initialize Three.js after DOM is loaded
+      initThreeJS();
+      initPopup(); // Initialize custom popup
+
+      // Hide loading overlay after a delay
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      setTimeout(() => {
+        gsap.to(loadingOverlay, { opacity: 0, duration: 0.8, onComplete: () => {
+          loadingOverlay.classList.add('hidden');
+          logAction('Page loaded');
+        }});
+      }, 1500); // Shorter delay for faster loading feel
+
+      // Hamburger menu functionality
+      const hamburger = document.querySelector('.hamburger');
+      const navDrawer = document.getElementById('navDrawer');
+      const closeBtn = navDrawer.querySelector('.close-btn');
+
+      hamburger.addEventListener('click', () => {
+        navDrawer.classList.add('active'); // Sets visibility: visible
+        // Use xPercent to slide in from the left, relative to its own width
+        gsap.to(navDrawer, { xPercent: 0, opacity: 1, duration: 0.3, ease: 'power2.out' });
+        logAction('Opened navigation menu');
+      });
+
+      closeBtn.addEventListener('click', () => {
+        // Use xPercent to slide out to the left, relative to its own width
+        gsap.to(navDrawer, { xPercent: -100, opacity: 0, duration: 0.3, ease: 'power2.in', onComplete: () => {
+          navDrawer.classList.remove('active'); // Sets display: none; and visibility: hidden;
+        }});
+        logAction('Closed navigation menu');
+      });
+
+      // Close nav when clicking outside (improved)
+      document.addEventListener('click', (e) => {
+        if (navDrawer.classList.contains('active') && !navDrawer.contains(e.target) && e.target !== hamburger) {
+          // Use xPercent to slide out to the left, relative to its own width
+          gsap.to(navDrawer, { xPercent: -100, opacity: 0, duration: 0.3, ease: 'power2.in', onComplete: () => {
+            navDrawer.classList.remove('active');
+          }});
+          logAction('Closed navigation menu by clicking outside');
+        }
+      });
+
+      // Initial Merkle Root display
+      const initialMerkleRoot = await buildMerkleTree(actionLogs.map(log => log.hash));
+      document.getElementById('merkleRoot').textContent = initialMerkleRoot.slice(0, 10) + '...';
+      document.getElementById('logCount').textContent = actionLogs.length;
+
+      // Search functionality
+      const mainSearchInput = document.getElementById('mainSearchInput');
+      mainSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          performSearch();
+        }
+      });
+    });
+
+    function performSearch() {
+      const query = document.getElementById('mainSearchInput').value;
+      logSearch(query);
+      if (query.trim() !== '') {
+        showCustomPopup(`Searching for: "${query}"`, [], 2000);
+      } else {
+        showCustomPopup("Please enter a search query.", [], 2000);
+      }
     }
   </script>
 </body>

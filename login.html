@@ -107,6 +107,18 @@
       box-sizing: border-box;
     }
 
+    .captcha-input{
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 14px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
     .submit-btn:hover {
       background-color: #6a4ce0;
     }
@@ -537,11 +549,10 @@
           <p>Please type the characters you see:</p>
           <div class="captcha-interactive">
             <div id="signInCaptchaDisplay" class="captcha-display" aria-label="CAPTCHA code"></div>
-            <input type="text" placeholder="Enter CAPTCHA" class="input captcha-input" id="signInCaptchaInput" aria-label="Enter CAPTCHA text" maxlength="6">
+            <input type="text" placeholder="Enter CAPTCHA" class="captcha-btn" id="signInCaptchaInput" aria-label="Enter CAPTCHA text" maxlength="6">
             <button class="captcha-btn" onclick="loadSignInCaptcha()" aria-label="Refresh CAPTCHA">Refresh</button>
           </div>
           <button class="captcha-btn" onclick="playAudioCaptcha('signIn')" aria-label="Play audio CAPTCHA">🔊 Audio CAPTCHA</button>
-          <button class="captcha-btn" onclick="showTextCaptchaFallback('signIn')" aria-label="Show text CAPTCHA fallback">Text Fallback</button>
         </div>
 
         <button class="submit-btn" onclick="submitSignInForm()">Sign in</button>
